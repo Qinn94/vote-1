@@ -1,10 +1,5 @@
 <template>
   <div class="home">
-    <!-- <div class="nav">
-      <span class="close"><i>X</i></span>
-      <span class="title">全国投教动漫大赛</span>
-      <span class="set">···</span>
-    </div> -->
     <div>
       <img class="banner" src="../assets/img/banner.png" alt="" />
     </div>
@@ -36,11 +31,11 @@
         <ul class="tab">
           <li
             v-for="(tab, index) in tabList"
-            @click="tabChange(tab.id, index)"
+            @click="tabChange(tab.code, index)"
             :class="{ 'tab-selected': index === currentIndex }"
             :key="tab.id"
           >
-            {{ tab.label }}
+            {{ tab.name }}
           </li>
         </ul>
         <!-- 作品列表 -->
@@ -49,7 +44,7 @@
             <div class="works-top">
               <img
                 class="works-img"
-                @click="lookWorksDetail(item.id)"
+                @click="lookWorksDetail(item.org_id)"
                 :src="item.image"
                 alt=""
               />
@@ -83,10 +78,10 @@
             </div>
           </div>
         </div>
-        <div class="page">
-          <span class="page-btn" @click="getLastPage">上一页</span>
+        <div class="page" v-if="totalPage > 1">
+          <span :class="{disabled:currentPage == 1}" class="page-btn" @click="getLastPage">上一页</span>
           <span> {{ currentPage }} / {{ totalPage }} </span>
-          <span class="page-btn" @click="getNextPage">下一页</span>
+          <span :class="{disabled:currentPage == totalPage}" class="page-btn" @click="getNextPage">下一页</span>
         </div>
       </div>
     </div>
@@ -98,138 +93,62 @@ export default {
   name: "Home",
   data() {
     return {
-      groupWorksList: [
-        {
-          image:
-            "http://design-svc.fat.lunz.cn/StaticFiles/BP9999999788/BV9999999433/SA9999998497/48b784f6-b771-432e-9dd8-87859db48028.png",
-          title:
-            "我是介绍信息哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦",
-          total: 1000,
-          id: 1,
-          rank: 1,
-        },
-        {
-          image:
-            "http://design-svc.fat.lunz.cn/StaticFiles/BP9999999788/BV9999999433/SA9999998497/48b784f6-b771-432e-9dd8-87859db48028.png",
-          title:
-            "我是介绍信息哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦",
-          total: 1000,
-          id: 2,
-          rank: 2,
-        },
-        {
-          image:
-            "http://design-svc.fat.lunz.cn/StaticFiles/BP9999999788/BV9999999433/SA9999998497/48b784f6-b771-432e-9dd8-87859db48028.png",
-          title: "我是介绍",
-          total: 1000,
-          id: 3,
-          rank: 3,
-        },
-        {
-          image:
-            "http://design-svc.fat.lunz.cn/StaticFiles/BP9999999788/BV9999999433/SA9999998497/48b784f6-b771-432e-9dd8-87859db48028.png",
-          title:
-            "我是介绍信息哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦",
-          total: 1000,
-          id: 4,
-        },
-      ],
-      schoolWorksList: [
-        {
-          image:
-            "http://design-svc.fat.lunz.cn/StaticFiles/BP9999999788/BV9999999433/SA9999998497/48b784f6-b771-432e-9dd8-87859db48028.png",
-          title:
-            "我是学校介绍信息哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦",
-          total: 2000,
-          id: 1,
-        },
-        {
-          image:
-            "http://design-svc.fat.lunz.cn/StaticFiles/BP9999999788/BV9999999433/SA9999998497/48b784f6-b771-432e-9dd8-87859db48028.png",
-          title:
-            "我是学校介绍信息哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦",
-          total: 2000,
-          id: 2,
-        },
-        {
-          image:
-            "http://design-svc.fat.lunz.cn/StaticFiles/BP9999999788/BV9999999433/SA9999998497/48b784f6-b771-432e-9dd8-87859db48028.png",
-          title: "我是学校介绍",
-          total: 2000,
-          id: 3,
-        },
-        {
-          image:
-            "http://design-svc.fat.lunz.cn/StaticFiles/BP9999999788/BV9999999433/SA9999998497/48b784f6-b771-432e-9dd8-87859db48028.png",
-          title:
-            "我是学校介绍信息哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦",
-          total: 2000,
-          id: 4,
-        },
-      ],
-      socailWorksList: [
-        {
-          image:
-            "http://design-svc.fat.lunz.cn/StaticFiles/BP9999999788/BV9999999433/SA9999998497/48b784f6-b771-432e-9dd8-87859db48028.png",
-          title:
-            "我是社会介绍信息哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦",
-          total: 3000,
-        },
-        {
-          image:
-            "http://design-svc.fat.lunz.cn/StaticFiles/BP9999999788/BV9999999433/SA9999998497/48b784f6-b771-432e-9dd8-87859db48028.png",
-          title:
-            "我是社会介绍信息哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦",
-          total: 3000,
-        },
-        {
-          image:
-            "http://design-svc.fat.lunz.cn/StaticFiles/BP9999999788/BV9999999433/SA9999998497/48b784f6-b771-432e-9dd8-87859db48028.png",
-          title: "我是社会介绍",
-          total: 3000,
-        },
-        {
-          image:
-            "http://design-svc.fat.lunz.cn/StaticFiles/BP9999999788/BV9999999433/SA9999998497/48b784f6-b771-432e-9dd8-87859db48028.png",
-          title:
-            "我是社会介绍信息哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦噢噢噢噢噢噢噢噢噢噢噢噢哦哦哦",
-          total: 3000,
-        },
-      ],
       worksList: [],
-      tabList: [
-        { label: "学校", id: "school" },
-        { label: "机构", id: "group" },
-        { label: "社会", id: "social" },
-      ],
+      tabList: [],
       currentPage: 1,
-      totalPage: 5,
+      totalPage: 1,
+      totalNum:0,
       currentIndex: 0,
+      currentCode:'',
+      page_size:12,
+      uid:''
     };
   },
+  created() {
+    this.worksList = this.schoolWorksList;
+    // 获取tab数据
+    this.getTabInfo();
+    this.getLocalUid();
+  },
   methods: {
-    // 切换tab页
-    tabChange(id, index) {
-      this.currentIndex = index;
-      switch (id) {
-        case "group":
-          this.worksList = this.groupWorksList;
-          break;
-        case "school":
-          this.worksList = this.schoolWorksList;
-          break;
-        case "social":
-          this.worksList = this.socailWorksList;
-          break;
-        default:
-          break;
+
+    //存储uuid到本地
+    setLocalUid(){
+      localStorage.setItem('vote_uid', this.getUuid());
+    },
+    //获取本地uuid
+    getLocalUid(){
+      this.uid = localStorage.getItem('vote_uid');
+      if(!this.uid){
+        this.setLocalUid()
       }
+    },
+
+    //生成用户唯一id
+    getUuid(){
+      var d = new Date().getTime();
+      if (window.performance && typeof window.performance.now === "function") {
+          d += performance.now(); //use high-precision timer if available
+      }
+      var uuid = 'xxxxxx_xxxxxxxxxxxxxxxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+          var r = (d + Math.random() * 16) % 16 | 0;
+          d = Math.floor(d / 16);
+          return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+      });
+      return uuid;
+  },
+    // 切换tab页
+    tabChange(code, index) {
+      this.currentIndex = index;
+      this.currentCode = code;
+      this.currentPage = 1;
+      this.getVoteList();
     },
     // 点击查看详情
     lookWorksDetail(id) {
       this.$router.push({
         path: "/detail",
-        query: { id },
+        query: { id,code:this.currentCode,uid:this.uid },
       });
     },
     // 点击投票
@@ -237,10 +156,42 @@ export default {
       if (work.disable) {
         return;
       }
-      work.total += 1;
-      work.disabled = true;
-      work.voteBtnInfo = "已投票";
+      
       // 在这里调投票的接口
+      this.axios.post('/wealth/szse_vote',
+      {
+        org_id:work.org_id,
+        code:this.currentCode,
+        uid:this.uid
+      }
+      // ,{
+      //   headers:{
+      //     'Content-Type':'application/x-www-form-urlencoded'
+      //   }
+      // }
+      ).then(result => {
+        if(result.data.code == 0){
+          work.total += 1;
+          work.disabled = true;
+          work.voteBtnInfo = "已投票";
+        }else{
+          alert(result.data.message)
+        }
+      })
+    },
+    //获取列表数据
+    getVoteList(){
+      let params = {
+        code:this.currentCode,
+        page_size:this.page_size,
+        page_num:this.currentPage
+      }
+      this.axios.get('/wealth/szse_activity',{params}).then(result => {
+        this.totalNum = result.data.total;
+        let page = parseInt(this.totalNum / this.page_size);
+        this.totalPage = this.totalNum % this.page_size == 0 ? page : page + 1;
+        this.worksList = result.data.data;
+      })
     },
     getLastPage() {
       if (this.currentPage <= 1) {
@@ -248,6 +199,7 @@ export default {
       }
       this.currentPage--;
       // 这里调接口获取上一页的数据
+      this.getVoteList()
     },
     getNextPage() {
       if (this.currentPage >= this.totalPage) {
@@ -255,11 +207,15 @@ export default {
       }
       this.currentPage++;
       // 这里调接口获取下一页的数据
+      this.getVoteList()
     },
-  },
-  created() {
-    this.worksList = this.schoolWorksList;
-    // 获取tab数据
+    getTabInfo(){
+      this.axios.get('/wealth/szse_tab').then(result => {
+        this.tabList = result.data.data;
+        this.currentCode = this.tabList[0].code;
+        this.getVoteList()
+      })
+    }
   },
 };
 </script>
@@ -314,7 +270,7 @@ export default {
 
 .action-content {
   width: 7rem;
-  height: 6.02rem;
+  height: 6.4rem;
   margin: 0 auto;
   padding: 0.4rem;
   font-size: 0.26rem;
@@ -377,7 +333,8 @@ export default {
 .works {
   width: 7.2rem;
   overflow: hidden;
-  margin: 0.24rem auto;
+  margin: 0.24rem auto 0;
+  padding-bottom:0.5rem;
 }
 
 .works-item {
@@ -455,6 +412,7 @@ export default {
 }
 
 .vote-btn {
+  color:#fff;
   float: left;
   width: 1.3rem;
   height: 0.56rem;
@@ -470,7 +428,7 @@ export default {
 }
 
 .page {
-  padding: 1rem 0 1.31rem;
+  padding: 0.2rem 0 1.31rem;
   font-size: 0.26rem;
   font-family: Alibaba PuHuiTi;
   font-weight: bold;
@@ -486,5 +444,9 @@ export default {
   border: 0.01rem solid #72effc;
   border-radius: 0.1rem;
   background: rgba(255, 255, 255, 0);
+}
+.disabled{
+  color:#ccc;
+  background:rgba(200,200,200,.3)
 }
 </style>

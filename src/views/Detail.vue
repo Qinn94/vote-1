@@ -21,7 +21,7 @@
     </div>
 
     <div class="vote-detail">
-      <img class="vote-img" src="../assets/img/home.jpg" alt="" />
+      <img class="vote-img" :src="detail.image" alt="" />
       <p class="author">作者： {{ detail.author }}</p>
     </div>
 
@@ -42,26 +42,49 @@
 export default {
   data() {
     return {
-      detail: {
-        title: "我们都是追梦人",
-        total: 1241,
-        rank: 19,
-        author:
-          "我是作者哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈",
-      },
+      detail: {},
       id: "",
+      code:'',
+      uid:'',
       btnDisabled: false,
     };
-  },
-  methods: {
-    vote() {
-      this.btnDisabled = true;
-      // 投票以后调接口获取新票数和排名
-    },
   },
   created() {
     // 获取作品id，然后调接口获取作品详情
     this.id = this.$route.query.id;
+    this.code = this.$route.query.code;
+    this.uid = this.$route.query.uid;
+    this.getDetail();
+  },
+  methods: {
+    vote() {
+      
+      // 投票以后调接口获取新票数和排名
+      this.axios.post('/wealth/szse_vote',
+      {
+        org_id:this.id,
+        code:this.code,
+        uid:this.uid
+      }
+      // ,{
+      //   headers:{
+      //     'Content-Type':'application/x-www-form-urlencoded'
+      //   }
+      // }
+      ).then(result => {
+        if(result.data.code == 0){
+          this.btnDisabled = true;
+          this.getDetail()
+        }else{
+          alert(result.data.message)
+        }
+      })
+    },
+    getDetail(){
+      this.axios.get('/wealth/szse_detail?org_id=' + this.id).then(result => {
+        this.detail = result.data.data
+      })
+    }
   },
 };
 </script>
