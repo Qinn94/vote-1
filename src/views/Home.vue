@@ -4,7 +4,7 @@
       <img class="banner" src="../assets/img/banner.png" alt="" />
     </div>
     <div class="content">
-      <img class="action-img" src="../assets/img/action.svg" alt="" />
+      <img class="action-img" src="../assets/img/hdjs.png" alt="" />
       <div class="action-content">
         <div>
           <p class="action-title">活动介绍：</p>
@@ -25,10 +25,15 @@
           </p>
         </div>
       </div>
-      <img class="works-title-img" src="../assets/img/action.svg" alt="" />
+      <img class="works-title-img" src="../assets/img/zpzs.png" alt="" />
+      <div class="searchBox">
+        <img @click="getSearchList" class="searchBtn" src="../assets/img/search.png"/>
+        <input @change="getSearchList" type="text" v-model="searchVal" placeholder="请输入作品名称" />
+        <img v-show="clearShow" @click="clearInput" class="searchClear" src="../assets/img/clear.png"/>
+      </div>
       <div>
         <!-- 三个tab -->
-        <ul class="tab">
+        <ul v-show="tabShow" class="tab">
           <li
             v-for="(tab, index) in tabList"
             @click="tabChange(tab.code, index)"
@@ -39,50 +44,57 @@
           </li>
         </ul>
         <!-- 作品列表 -->
-        <div class="works">
-          <div class="works-item" v-for="item in worksList" :key="item.id">
-            <div class="works-top">
-              <img
-                class="works-img"
-                @click="lookWorksDetail(item.org_id)"
-                :src="item.image"
-                alt=""
-              />
-              <p
-                v-if="item.rank === 1 || item.rank === 2 || item.rank === 3"
-                class="ranking"
-                :class="{ 'ranking-two': item.rank === 2 || item.rank === 3 }"
-              >
-                {{
-                  item.rank === 1
-                    ? "第一名"
-                    : item.rank === 2
-                    ? "第二名"
-                    : "第三名"
-                }}
-              </p>
-            </div>
-            <div class="works-content">
-              <p class="works-info">{{ item.title }}</p>
-              <div class="vote">
-                <p class="works-count">{{ item.total }}票</p>
-                <button
-                  :disabled="item.disabled"
-                  @click="vote(item)"
-                  class="vote-btn"
-                  :class="{ 'voted-btn': item.disabled }"
+        <div v-show="!noData" class="hasData">
+          <div class="works">
+            <div class="works-item" v-for="item in worksList" :key="item.id">
+              <div class="works-top">
+                <img
+                  class="works-img"
+                  @click="lookWorksDetail(item.org_id)"
+                  :src="item.image"
+                  alt=""
+                />
+                <p
+                  v-if="item.rank === 1 || item.rank === 2 || item.rank === 3"
+                  class="ranking"
+                  :class="{ 'ranking-two': item.rank === 2 || item.rank === 3 }"
                 >
-                  {{ item.voteBtnInfo ? item.voteBtnInfo : "投票" }}
-                </button>
+                  {{
+                    item.rank === 1
+                      ? "第一名"
+                      : item.rank === 2
+                      ? "第二名"
+                      : "第三名"
+                  }}
+                </p>
+              </div>
+              <div class="works-content">
+                <p class="works-info">{{ item.title }}</p>
+                <div class="vote">
+                  <p class="works-count">{{ item.total }}票</p>
+                  <button
+                    :disabled="item.disabled"
+                    @click="vote(item)"
+                    class="vote-btn"
+                    :class="{ 'voted-btn': item.disabled }"
+                  >
+                    {{ item.voteBtnInfo ? item.voteBtnInfo : "投票" }}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
+          <div class="page" v-if="totalPage > 1">
+            <span :class="{disabled:currentPage == 1}" class="page-btn" @click="getLastPage">上一页</span>
+            <span> {{ currentPage }} / {{ totalPage }} </span>
+            <span :class="{disabled:currentPage == totalPage}" class="page-btn" @click="getNextPage">下一页</span>
+          </div>
         </div>
-        <div class="page" v-if="totalPage > 1">
-          <span :class="{disabled:currentPage == 1}" class="page-btn" @click="getLastPage">上一页</span>
-          <span> {{ currentPage }} / {{ totalPage }} </span>
-          <span :class="{disabled:currentPage == totalPage}" class="page-btn" @click="getNextPage">下一页</span>
+        <div v-show="noData" class="noData">
+          <p>没有找到相关作品</p>
+          <p v-show="searchVal != ''">"换个词搜索看吧"</p>
         </div>
+        
       </div>
     </div>
   </div>
@@ -101,7 +113,11 @@ export default {
       currentIndex: 0,
       currentCode:'',
       page_size:12,
-      uid:''
+      uid:'',
+      searchVal:'',
+      clearShow:false,
+      tabShow:true,
+      noData:false
     };
   },
   created() {
@@ -191,6 +207,7 @@ export default {
         let page = parseInt(this.totalNum / this.page_size);
         this.totalPage = this.totalNum % this.page_size == 0 ? page : page + 1;
         this.worksList = result.data.data;
+        this.noData = this.worksList.length > 0 ? false : true;
       })
     },
     getLastPage() {
@@ -215,8 +232,33 @@ export default {
         this.currentCode = this.tabList[0].code;
         this.getVoteList()
       })
+    },
+    //获取搜索结果
+    getSearchList(){
+      console.log(this.searchVal)
+      if(this.searchVal == '') return;
+      //调用搜索接口
+      let params = {
+
+      }
+      this.axios.get('',{params}).then(result => {
+
+      })
+      
+    },
+    //清空输入框
+    clearInput(){
+      this.searchVal = '';
+      this.currentPage = 1;
+      this.getVoteList();
     }
   },
+  watch:{
+    searchVal(val,oldVal){
+      this.clearShow = val == '' ? false : true;
+      this.tabShow = val == '' ? true : false;
+    }
+  }
 };
 </script>
 
@@ -260,12 +302,13 @@ export default {
 .content {
   max-width: 750px;
   margin: auto;
+  margin-top:-.7rem;
   text-align: center;
 }
 
 .action-img {
   width: 70%;
-  transform: translate(0px, -50%);
+  -transform: translate(0px, -50%);
 }
 
 .action-content {
@@ -281,6 +324,7 @@ export default {
   box-shadow: 0px 18px 40px 0px rgba(5, 17, 102, 0.25);
   color: #fff;
   background: #1f33c3;
+  margin-bottom:.2rem;
 }
 
 .action-title {
@@ -301,35 +345,71 @@ export default {
 
 .works-title-img {
   width: 70%;
-  margin: 20px 0;
+  margin: .4rem auto 0;
+}
+.searchBox{
+  width:6.9rem;
+  margin:0 .3rem .3rem;
+  height:.8rem;
+  background: #1F33C3;
+  border-radius: .18rem;
+  display: flex;
+  align-items: center;
+}
+.searchBox .searchBtn{
+  display:block;
+  width:.28rem;
+  height:.28rem;
+  margin:0 .3rem 0 .4rem;
+}
+.searchBox .searchClear{
+  display:block;
+  width:.28rem;
+  height:.28rem;
+  margin:0 .3rem 0 .4rem;
+}
+.searchBox input{
+  background:#1F33C3;
+  height:.6rem;
+  width:5rem;
+  border:none;
+  outline: none;
+  color:#fff;
 }
 
 .tab {
   overflow: hidden;
   width: 6.9rem;
-  height: 0.8rem;
-  line-height: 0.8rem;
+  height: 0.36rem;
+  line-height: 0.36rem;
   margin: 0 auto;
   border-radius: 0.18rem;
   font-size: 0.3rem;
   font-family: Alibaba PuHuiTi;
   font-weight: bold;
   list-style: none;
-  color: #1b227f;
-  background-color: #fff;
+  color: #9DA9FF;
 }
 
 .tab li {
   width: 2.3rem;
   height: 100%;
   float: left;
+  border-right:1px solid #9DA9FF; 
+}
+.tab li:last-child{
+  border-right:none;
 }
 
 .tab-selected {
   color: #fff;
-  background: linear-gradient(64deg, #4c57f5, #243ff5, #001cd7);
+  font-weight:bold;
+  /* background: linear-gradient(64deg, #4c57f5, #243ff5, #001cd7); */
 }
 
+.hasData{
+  padding-bottom:1rem;
+}
 .works {
   width: 7.2rem;
   overflow: hidden;
@@ -448,5 +528,17 @@ export default {
 .disabled{
   color:#ccc;
   background:rgba(200,200,200,.3)
+}
+.noData{
+  padding:1rem 0 6rem;
+  text-align:center;
+  color:#fff;
+}
+.noData p:first-child{
+  font-size: .28rem;
+  margin-bottom:.22rem;
+}
+.noData p:last-child{
+  font-size: .24rem;
 }
 </style>
