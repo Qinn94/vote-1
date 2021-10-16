@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import { MessageBox } from 'mint-ui';
 export default {
   data() {
     return {
@@ -76,7 +77,7 @@ export default {
           this.btnDisabled = true;
           this.getDetail()
         }else{
-          alert(result.data.message)
+          MessageBox('',result.data.message)
         }
       })
     },

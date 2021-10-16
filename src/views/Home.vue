@@ -101,6 +101,7 @@
 </template>
 
 <script>
+import { MessageBox } from 'mint-ui';
 export default {
   name: "Home",
   data() {
@@ -117,16 +118,55 @@ export default {
       searchVal:'',
       clearShow:false,
       tabShow:true,
-      noData:false
+      noData:false,
+      isWechat:false
     };
   },
   created() {
-    this.worksList = this.schoolWorksList;
+    this.isWechat = this.isWechatEvt();
+    if(this.isWechat){
+      this.getWechatOauth2();
+    }else{
+      this.getLocalUid();
+    }
     // 获取tab数据
     this.getTabInfo();
-    this.getLocalUid();
   },
   methods: {
+    //获取地址栏参数
+    getQueryVariable(variable)
+    {
+      var query = window.location.search.substring(1);
+      var vars = query.split("&");
+      for (var i=0;i<vars.length;i++) {
+              var pair = vars[i].split("=");
+              if(pair[0] == variable){return pair[1];}
+      }
+      return(false);
+    },
+    //获取微信授权
+    getWechatOauth2(){
+      let code = this.getQueryVariable('code');
+      this.getOpenId(code)
+    },
+    //获取微信openid
+    getOpenId(code){
+      this.axios.get('https://yb.cfbond.com/wxtp/getuser?code=' + code).then(result => {
+        this.uid = result.data.openid;
+        // this.toast('微信uid' + this.uid)
+      })
+    },
+    //判断是否在微信中打开
+    isWechatEvt(){
+      var ua = navigator.userAgent.toLowerCase();
+      if (ua.match(/MicroMessenger/i) == "micromessenger") {
+          return true;
+        }
+      else{
+        return false
+      }
+    },
+
 
     //存储uuid到本地
     setLocalUid(){
@@ -138,6 +178,7 @@ export default {
       if(!this.uid){
         this.setLocalUid()
       }
+      // this.toast('本地uid' + this.uid)
     },
 
     //生成用户唯一id
@@ -172,10 +213,6 @@ export default {
       if (work.flag) {
         return;
       }
-      // this.axios.post('https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxdb73c452aac285da&redirect_uri=https://company.cfbond.com/wx1.html&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect').then(result => {
-      //     console.log(result)
-      //     alert(result)
-      // })
       
       // 在这里调投票的接口
       this.axios.post('/wealth/szse_vote',
@@ -194,9 +231,12 @@ export default {
           work.total += 1;
           work.flag = true;
         }else{
-          alert(result.data.message)
+          this.toast(result.data.message)
         }
       })
+    },
+    toast(msg){
+      MessageBox('', msg);
     },
     //获取列表数据
     getVoteList(){
