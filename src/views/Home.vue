@@ -73,12 +73,12 @@
                 <div class="vote">
                   <p class="works-count">{{ item.total }}票</p>
                   <button
-                    :disabled="item.disabled"
+                    :disabled="item.flag"
                     @click="vote(item)"
                     class="vote-btn"
-                    :class="{ 'voted-btn': item.disabled }"
+                    :class="{ 'voted-btn': item.flag }"
                   >
-                    {{ item.voteBtnInfo ? item.voteBtnInfo : "投票" }}
+                    {{ item.flag ? '已投票' : "投票" }}
                   </button>
                 </div>
               </div>
@@ -169,9 +169,13 @@ export default {
     },
     // 点击投票
     vote(work) {
-      if (work.disable) {
+      if (work.flag) {
         return;
       }
+      // this.axios.post('https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxdb73c452aac285da&redirect_uri=https://company.cfbond.com/wx1.html&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect').then(result => {
+      //     console.log(result)
+      //     alert(result)
+      // })
       
       // 在这里调投票的接口
       this.axios.post('/wealth/szse_vote',
@@ -188,8 +192,7 @@ export default {
       ).then(result => {
         if(result.data.code == 0){
           work.total += 1;
-          work.disabled = true;
-          work.voteBtnInfo = "已投票";
+          work.flag = true;
         }else{
           alert(result.data.message)
         }
@@ -200,7 +203,9 @@ export default {
       let params = {
         code:this.currentCode,
         page_size:this.page_size,
-        page_num:this.currentPage
+        page_num:this.currentPage,
+        uid:this.uid,
+        keyword:this.searchVal
       }
       this.axios.get('/wealth/szse_activity',{params}).then(result => {
         this.totalNum = result.data.total;
@@ -238,12 +243,7 @@ export default {
       console.log(this.searchVal)
       if(this.searchVal == '') return;
       //调用搜索接口
-      let params = {
-
-      }
-      this.axios.get('',{params}).then(result => {
-
-      })
+      this.getVoteList()
       
     },
     //清空输入框
