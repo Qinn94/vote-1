@@ -159,8 +159,7 @@ export default {
     //app跳转
     goApp (){
       var _url = window.location.href+'&share_forbid=1';
-      // var _id = document.getElementsByTagName("meta")["contentid"].getAttribute("content");
-      let _id = '';
+      var _id = this.getQueryVariable('id');
       var _urlParam = "cfbond://com.cfbond.acfw/applinks?id="+_id+"&mode=2&url="+_url
       console.log(_url)
       if(navigator.userAgent.match(/android/gi)){
