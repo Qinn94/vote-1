@@ -50,7 +50,7 @@
               <div class="works-top">
                 <img
                   class="works-img"
-                  @click="lookWorksDetail(item.org_id)"
+                  @click="lookWorksDetail(item.org_id,item.rank)"
                   :src="item.image"
                   alt=""
                 />
@@ -202,10 +202,10 @@ export default {
       this.getVoteList();
     },
     // 点击查看详情
-    lookWorksDetail(id) {
+    lookWorksDetail(id,rank) {
       this.$router.push({
         path: "/detail",
-        query: { id,code:this.currentCode,uid:this.uid },
+        query: { id,code:this.currentCode,uid:this.uid,rank},
       });
     },
     // 点击投票
@@ -218,7 +218,7 @@ export default {
       this.axios.post('/wealth/szse_vote',
       {
         org_id:work.org_id,
-        code:this.currentCode,
+        code:this.currentCode.toString(),
         uid:this.uid
       }
       // ,{
@@ -432,7 +432,7 @@ export default {
 }
 
 .tab li {
-  width: 2.3rem;
+  width: 2.2rem;
   height: 100%;
   float: left;
   border-right:1px solid #9DA9FF; 

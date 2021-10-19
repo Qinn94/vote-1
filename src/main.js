@@ -8,7 +8,7 @@ Vue.use(Mint);
 Vue.config.productionTip = false
 
 Vue.prototype.axios = axios
-axios.defaults.baseURL = "https://a.cfbond.com"
+axios.defaults.baseURL = "https://goldeye.cfbond.com"
 new Vue({
   router,
   render: h => h(App)

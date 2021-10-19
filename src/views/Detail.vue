@@ -14,14 +14,14 @@
         </div>
         <div class="vote-line"></div>
         <div>
-          <p class="number ranking">{{ detail.rank }}</p>
+          <p class="number ranking">{{rank }}</p>
           <p class="vote-text">排名</p>
         </div>
       </div>
     </div>
 
     <div class="vote-detail">
-      <img class="vote-img" :src="detail.image" alt="" />
+      <div v-html="detail.detail"></div>
       <p class="author">作者： {{ detail.author }}</p>
     </div>
 
@@ -47,6 +47,7 @@ export default {
       id: "",
       code:'',
       uid:'',
+      rank:'',
       btnDisabled: false,
     };
   },
@@ -55,6 +56,7 @@ export default {
     this.id = this.$route.query.id;
     this.code = this.$route.query.code;
     this.uid = this.$route.query.uid;
+    this.rank = this.$route.query.rank;
     this.getDetail();
   },
   methods: {
