@@ -1,6 +1,10 @@
 <template>
   <div class="home">
-    <div>
+    <div v-if="!isApp && !isWechat" id="openappBox">
+      <img src="http://specials.cfbond.com/static/images/appOpenlogo.png">
+      <button @click="goApp"></button>
+    </div>
+    <div :class="{topBlank:bannerHasBlank}">
       <img class="banner" src="../assets/img/banner.png" alt="" />
     </div>
     <div class="content">
@@ -50,7 +54,7 @@
               <div class="works-top">
                 <img
                   class="works-img"
-                  @click="lookWorksDetail(item.org_id,item.rank)"
+                  @click="lookWorksDetail(item.org_id,item.rank,item.flag)"
                   :src="item.image"
                   alt=""
                 />
@@ -119,20 +123,52 @@ export default {
       clearShow:false,
       tabShow:true,
       noData:false,
-      isWechat:false
+      isWechat:false,
+      isApp:false,
+      bannerHasBlank:false
     };
   },
   created() {
     this.isWechat = this.isWechatEvt();
+    this.isApp = this.isInApp();
     if(this.isWechat){
       this.getWechatOauth2();
     }else{
       this.getLocalUid();
+      this.getTabInfo();
     }
-    // 获取tab数据
-    this.getTabInfo();
+    if(!this.isWechat && !this.isApp){
+      this.bannerHasBlank = true
+    }else{
+      this.bannerHasBlank = false
+    }
+    
   },
   methods: {
+
+    //判断是否在app内部
+    isInApp(){
+      var userAgent = navigator.userAgent.toLowerCase();//获取UA信息
+      if(userAgent.indexOf("cfbondclient") != -1){//判断ua中是否含有和app端约定好的标识cfbondclient
+        return true;
+      }
+      else{
+        return false;
+      }
+    },
+    //app跳转
+    goApp (){
+      var _url = window.location.href+'&share_forbid=1';
+      // var _id = document.getElementsByTagName("meta")["contentid"].getAttribute("content");
+      let _id = '';
+      var _urlParam = "cfbond://com.cfbond.acfw/applinks?id="+_id+"&mode=2&url="+_url
+      console.log(_url)
+      if(navigator.userAgent.match(/android/gi)){
+      window.location.href="https://a.app.qq.com/o/simple.jsp?pkgname=com.cfbond.acfw&android_schema="+encodeURIComponent(_urlParam )
+      }else{
+      window.location.href="https://a.app.qq.com/o/simple.jsp?pkgname=com.cfbond.acfw&ios_schema="+encodeURIComponent(_urlParam )
+      }
+    },
     //获取地址栏参数
     getQueryVariable(variable)
     {
@@ -150,16 +186,21 @@ export default {
       this.getOpenId(code)
     },
     //获取微信openid
-    getOpenId(code){
-      this.axios.get('https://yb.cfbond.com/wxtp/getuser?code=' + code).then(result => {
-        this.uid = result.data.openid;
-        // this.toast('微信uid' + this.uid)
-      })
+    async getOpenId(code){
+      let result = await this.axios.get('https://yb.cfbond.com/wxtp/getuser?code=' + code);
+      let uid = result.data && result.data.openid;
+      if(uid){
+        this.uid = uid;
+        this.setLocalopenid(uid);
+      }else{
+        this.getLocalUid();
+      }
+      this.getTabInfo();
     },
     //判断是否在微信中打开
     isWechatEvt(){
       var ua = navigator.userAgent.toLowerCase();
-      if (ua.match(/MicroMessenger/i) == "micromessenger") {
+      if (ua.match(/MicroMessenger/i) == "micromessenger" && this.getQueryVariable('code')) {
           return true;
         }
       else{
@@ -167,6 +208,10 @@ export default {
       }
     },
 
+    //存储openid
+    setLocalopenid(openid){
+      localStorage.setItem('vote_uid', openid);
+    },
 
     //存储uuid到本地
     setLocalUid(){
@@ -202,10 +247,10 @@ export default {
       this.getVoteList();
     },
     // 点击查看详情
-    lookWorksDetail(id,rank) {
+    lookWorksDetail(id,rank,flag) {
       this.$router.push({
         path: "/detail",
-        query: { id,code:this.currentCode,uid:this.uid,rank},
+        query: { id,code:this.currentCode,uid:this.uid,rank,flag,blank:this.bannerHasBlank},
       });
     },
     // 点击投票
@@ -213,7 +258,10 @@ export default {
       if (work.flag) {
         return;
       }
-      
+      if(!this.isWechat && !this.isApp){
+        this.toast('需点击上方，打开中国财富APP进行投票');
+        return;
+      }
       // 在这里调投票的接口
       this.axios.post('/wealth/szse_vote',
       {
@@ -581,4 +629,21 @@ export default {
 .noData p:last-child{
   font-size: .24rem;
 }
+#openappBox{
+  height:1rem;
+  background:#F9F9F9;
+  padding:0 .3rem;
+  justify-content: space-between;align-items: center;
+  display:flex;
+  position:fixed;
+  width:100%;
+  box-sizing: border-box;
+}
+.topBlank{padding-top:1rem;}
+#openappBox img{width:2.76rem;height:auto;}
+#openappBox button{
+  
+  background:url(http://specials.cfbond.com/static/images/appOpenBtn.png) no-repeat;
+width:1.64rem;height:.62rem;border:none;background-size:100% 100%;outline:none;}
+
 </style>

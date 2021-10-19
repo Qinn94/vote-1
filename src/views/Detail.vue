@@ -1,5 +1,9 @@
 <template>
   <div class="detail">
+    <div v-if="false" id="openappBox">
+      <img src="http://specials.cfbond.com/static/images/appOpenlogo.png">
+      <button @click="goApp"></button>
+    </div>
     <div class="title-fa">
       <div class="title">
         <p class="title-text">标题：{{ detail.title }}</p>
@@ -49,6 +53,8 @@ export default {
       uid:'',
       rank:'',
       btnDisabled: false,
+      flag:false,
+      bannerHasBlank:false
     };
   },
   created() {
@@ -57,11 +63,34 @@ export default {
     this.code = this.$route.query.code;
     this.uid = this.$route.query.uid;
     this.rank = this.$route.query.rank;
+    this.flag = this.$route.query.flag;
+    this.btnDisabled = this.flag === 'true' ? true : false;
+    this.bannerHasBlank = this.$route.query.blank === 'true' ? true : false;;
     this.getDetail();
   },
+  mounted(){
+    
+  },
   methods: {
+    //app跳转
+    goApp (){
+      var _url = window.location.href+'&share_forbid=1';
+      // var _id = document.getElementsByTagName("meta")["contentid"].getAttribute("content");
+      let _id = '';
+      var _urlParam = "cfbond://com.cfbond.acfw/applinks?id="+_id+"&mode=2&url="+_url
+      console.log(_url)
+      if(navigator.userAgent.match(/android/gi)){
+      window.location.href="https://a.app.qq.com/o/simple.jsp?pkgname=com.cfbond.acfw&android_schema="+encodeURIComponent(_urlParam )
+      }else{
+      window.location.href="https://a.app.qq.com/o/simple.jsp?pkgname=com.cfbond.acfw&ios_schema="+encodeURIComponent(_urlParam )
+      }
+    },
     vote() {
-      
+      if(this.btnDisabled) return;
+      if(this.bannerHasBlank){
+        MessageBox('','需返回上一页，打开中国财富APP进行投票');
+        return;
+      }
       // 投票以后调接口获取新票数和排名
       this.axios.post('/wealth/szse_vote',
       {
@@ -210,4 +239,21 @@ export default {
 .btn-disabled {
   background: #cccccc;
 }
+#openappBox{
+  height:1rem;
+  background:#F9F9F9;
+  padding:0 .3rem;
+  justify-content: space-between;align-items: center;
+  display:flex;
+  position:fixed;
+  width:100%;
+  box-sizing: border-box;
+  top:0;
+}
+.topBlank{top:1rem;}
+#openappBox img{width:2.76rem;height:auto;}
+#openappBox button{
+  
+  background:url(http://specials.cfbond.com/static/images/appOpenBtn.png) no-repeat;
+width:1.64rem;height:.62rem;border:none;background-size:100% 100%;outline:none;}
 </style>
