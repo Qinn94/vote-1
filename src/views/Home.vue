@@ -214,7 +214,9 @@ export default {
 
     //存储uuid到本地
     setLocalUid(){
-      localStorage.setItem('vote_uid', this.getUuid());
+      let uid = this.getUuid();
+      this.uid = uid;
+      localStorage.setItem('vote_uid', uid);
     },
     //获取本地uuid
     getLocalUid(){
@@ -291,6 +293,7 @@ export default {
     },
     //获取列表数据
     getVoteList(){
+      console.log(this.uid)
       let params = {
         code:this.currentCode,
         page_size:this.page_size,
