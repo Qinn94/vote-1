@@ -247,6 +247,10 @@ export default {
     },
     // 点击查看详情
     lookWorksDetail(id,rank,flag) {
+      if(!this.isWechat && !this.isApp){
+        this.toast('需点击上方，打开中国财富APP进行投票');
+        return;
+      }
       this.$router.push({
         path: "/detail",
         query: { id,code:this.currentCode,uid:this.uid,rank,flag,blank:this.bannerHasBlank},
