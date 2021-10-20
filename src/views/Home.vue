@@ -59,7 +59,7 @@
                   alt=""
                 />
                 <p
-                  v-if="item.rank === 1 || item.rank === 2 || item.rank === 3"
+                  v-if="(item.rank === 1 || item.rank === 2 || item.rank === 3) && item.total !== 0"
                   class="ranking"
                   :class="{ 'ranking-two': item.rank === 2 || item.rank === 3 }"
                 >
@@ -637,6 +637,7 @@ export default {
   position:fixed;
   width:100%;
   box-sizing: border-box;
+  z-index:9999;
 }
 .topBlank{padding-top:1rem;}
 #openappBox img{width:2.76rem;height:auto;}

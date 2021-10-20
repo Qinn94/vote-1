@@ -257,3 +257,8 @@ export default {
   background:url(http://specials.cfbond.com/static/images/appOpenBtn.png) no-repeat;
 width:1.64rem;height:.62rem;border:none;background-size:100% 100%;outline:none;}
 </style>
+<style>
+#editWrap img{
+    width:100%
+}
+</style>
