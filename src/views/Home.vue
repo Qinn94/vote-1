@@ -466,6 +466,7 @@ export default {
   border:none;
   outline: none;
   color:#fff;
+  font-size:16px;
 }
 
 .tab {
