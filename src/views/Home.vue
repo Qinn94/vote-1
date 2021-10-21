@@ -116,7 +116,7 @@ export default {
       totalPage: 1,
       totalNum:0,
       currentIndex: 0,
-      currentCode:'',
+      currentCode:-1,
       page_size:12,
       uid:'',
       searchVal:'',
@@ -299,13 +299,16 @@ export default {
     },
     //获取列表数据
     getVoteList(){
-      console.log(this.uid)
+      if(this.currentCode === -1) return;
       let params = {
         code:this.currentCode,
         page_size:this.page_size,
         page_num:this.currentPage,
         uid:this.uid,
         keyword:this.searchVal
+      }
+      if(this.searchVal !== ''){
+        delete params.code
       }
       this.axios.get('/wealth/szse_activity',{params}).then(result => {
         this.totalNum = result.data.total;
