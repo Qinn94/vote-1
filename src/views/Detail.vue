@@ -18,7 +18,7 @@
         </div>
         <div class="vote-line"></div>
         <div>
-          <p class="number ranking">{{rank }}</p>
+          <p class="number ranking">{{detail.total === 0 ? '/' : rank }}</p>
           <p class="vote-text">排名</p>
         </div>
       </div>
