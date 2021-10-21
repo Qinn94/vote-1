@@ -284,9 +284,20 @@ export default {
         if(result.data.code == 0){
           work.total += 1;
           work.flag = true;
+          this.getVoteList()
         }else{
           this.toast(result.data.message)
         }
+      })
+    },
+    //获取排名
+    getRank(work){
+      let params = {
+        org_id:work.org_id,
+        code:this.currentCode.toString(),
+      }
+      this.axios.get('/wealth/szse_rank',{params}).then(result => {
+        console.log(result)
       })
     },
     toast(msg){
