@@ -144,6 +144,9 @@ export default {
       this.bannerHasBlank = false
     } 
   },
+  activated() {
+    this.getVoteList()
+  },
   methods: {
 
     //判断是否在app内部
@@ -249,10 +252,10 @@ export default {
     },
     // 点击查看详情
     lookWorksDetail(id,rank,flag) {
-      if(!this.isWechat && !this.isApp){
-        this.toast('需点击上方，打开中国财富APP进行投票');
-        return;
-      }
+      // if(!this.isWechat && !this.isApp){
+      //   this.toast('需点击上方，打开中国财富APP进行投票');
+      //   return;
+      // }
       this.$router.push({
         path: "/detail",
         query: { id,code:this.currentCode,uid:this.uid,rank,flag,blank:this.bannerHasBlank},
@@ -288,16 +291,6 @@ export default {
         }else{
           this.toast(result.data.message)
         }
-      })
-    },
-    //获取排名
-    getRank(work){
-      let params = {
-        org_id:work.org_id,
-        code:this.currentCode.toString(),
-      }
-      this.axios.get('/wealth/szse_rank',{params}).then(result => {
-        console.log(result)
       })
     },
     toast(msg){

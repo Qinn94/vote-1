@@ -85,12 +85,23 @@ export default {
       window.location.href="https://a.app.qq.com/o/simple.jsp?pkgname=com.cfbond.acfw&ios_schema="+encodeURIComponent(_urlParam )
       }
     },
+    //获取排名
+    getRank(){
+      let params = {
+        org_id:this.id,
+        code:this.code
+      }
+      this.axios.get('/wealth/szse_rank',{params}).then(result => {
+        console.log(result)
+        this.rank = result.data.data
+      })
+    },
     vote() {
       if(this.btnDisabled) return;
-      if(this.bannerHasBlank){
-        MessageBox('','需返回上一页，打开中国财富APP进行投票');
-        return;
-      }
+      // if(this.bannerHasBlank){
+      //   MessageBox('','需返回上一页，打开中国财富APP进行投票');
+      //   return;
+      // }
       // 投票以后调接口获取新票数和排名
       this.axios.post('/wealth/szse_vote',
       {
@@ -106,7 +117,10 @@ export default {
       ).then(result => {
         if(result.data.code == 0){
           this.btnDisabled = true;
-          this.getDetail()
+          this.$route.query.flag = true;
+          this.btnDisabled = true;
+          this.getDetail();
+          this.getRank()
         }else{
           MessageBox('',result.data.message)
         }
