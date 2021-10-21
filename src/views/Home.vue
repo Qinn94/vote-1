@@ -132,7 +132,7 @@ export default {
     this.isWechat = this.isWechatEvt();
     this.isApp = this.isInApp();
     if(this.isWechat){
-      // this.wxShare();
+      this.wxShare();
       this.getWechatOauth2();
     }else{
       this.getLocalUid();
@@ -359,14 +359,14 @@ export default {
       var _title = '2021年第三届全国投教动漫大赛';
 			var link = location.href;
       let desc = '深交所联合人民日报社《讽刺与幽默》、证券时报共同举办的 2021年第三届全国投教动漫大赛，正在火热进行中！';
-      let imgUrl = '../assets/img/banner.png'
+      let imgUrl = 'https://wxtp.cfbond.com/wxtp2021.png'
       let params = {
         "url": link
       }
       this.axios.get('https://app.cfbond.com/cfbond_app/Wx.getSignature.action',{params}).then(result => {
         let data = result.data;
         wx.config({
-						debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来
+						debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来
 						appId: data.appId, // 必填，公众号的唯一标识
 						timestamp: data.timestamp, // 必填，生成签名的时间戳
 						nonceStr: data.nonceStr, // 必填，生成签名的随机串
