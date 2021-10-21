@@ -24,8 +24,8 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  mode:'history',
-  base: '/wxtp2021',
+  // mode:'history',
+  base: process.env.BASE_URL,
   routes
 })
 

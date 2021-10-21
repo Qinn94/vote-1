@@ -54,7 +54,7 @@
               <div class="works-top">
                 <img
                   class="works-img"
-                  @click="lookWorksDetail(item.org_id,item.rank,item.flag)"
+                  @click="gotoDetail(item.org_id,item.rank,item.flag)"
                   :src="item.image"
                   alt=""
                 />
@@ -161,9 +161,9 @@ export default {
     },
     //app跳转
     goApp (){
-      var _url = window.location.href+'&share_forbid=1';
+      var _url = window.location.href;
       var _id = this.getQueryVariable('id');
-      var _urlParam = "cfbond://com.cfbond.acfw/applinks?id="+_id+"&mode=2&url="+_url
+      var _urlParam = "cfbond://com.cfbond.acfw/applinks?id="+_id+"&mode=2&share_forbid=1&url="+_url
       console.log(_url)
       if(navigator.userAgent.match(/android/gi)){
       window.location.href="https://a.app.qq.com/o/simple.jsp?pkgname=com.cfbond.acfw&android_schema="+encodeURIComponent(_urlParam )
@@ -251,7 +251,7 @@ export default {
       this.getVoteList();
     },
     // 点击查看详情
-    lookWorksDetail(id,rank,flag) {
+    gotoDetail(id,rank,flag) {
       if(!this.isWechat && !this.isApp){
         this.toast('需点击上方，打开中国财富APP进行投票');
         return;
