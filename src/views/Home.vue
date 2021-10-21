@@ -77,12 +77,12 @@
                 <div class="vote">
                   <p class="works-count">{{ item.total }}票</p>
                   <button
-                    :disabled="item.flag"
+                    :disabled="item.flag && !bannerHasBlank"
                     @click="vote(item)"
                     class="vote-btn"
-                    :class="{ 'voted-btn': item.flag }"
+                    :class="{ 'voted-btn': item.flag && !bannerHasBlank }"
                   >
-                    {{ item.flag ? '已投票' : "投票" }}
+                    {{ item.flag && !bannerHasBlank ? '已投票' : "投票" }}
                   </button>
                 </div>
               </div>
@@ -132,6 +132,7 @@ export default {
     this.isWechat = this.isWechatEvt();
     this.isApp = this.isInApp();
     if(this.isWechat){
+      // this.wxShare();
       this.getWechatOauth2();
     }else{
       this.getLocalUid();
@@ -141,8 +142,7 @@ export default {
       this.bannerHasBlank = true
     }else{
       this.bannerHasBlank = false
-    }
-    
+    } 
   },
   methods: {
 
@@ -260,13 +260,14 @@ export default {
     },
     // 点击投票
     vote(work) {
-      if (work.flag) {
-        return;
-      }
       if(!this.isWechat && !this.isApp){
         this.toast('需点击上方，打开中国财富APP进行投票');
         return;
       }
+      if (work.flag) {
+        return;
+      }
+      
       // 在这里调投票的接口
       this.axios.post('/wealth/szse_vote',
       {
@@ -345,6 +346,55 @@ export default {
       this.searchVal = '';
       this.currentPage = 1;
       this.getVoteList();
+    },
+    wxShare(){
+      var _title = '2021年第三届全国投教动漫大赛';
+			var link = location.href;
+      let desc = '深交所联合人民日报社《讽刺与幽默》、证券时报共同举办的 2021年第三届全国投教动漫大赛，正在火热进行中！';
+      let imgUrl = '../assets/img/banner.png'
+      let params = {
+        "url": link
+      }
+      this.axios.get('https://app.cfbond.com/cfbond_app/Wx.getSignature.action',{params}).then(result => {
+        let data = result.data;
+        wx.config({
+						debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来
+						appId: data.appId, // 必填，公众号的唯一标识
+						timestamp: data.timestamp, // 必填，生成签名的时间戳
+						nonceStr: data.nonceStr, // 必填，生成签名的随机串
+						signature: data.signature, // 必填，签名，见附录1
+						jsApiList: [
+							"onMenuShareTimeline",
+							"onMenuShareAppMessage"
+						] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+					});
+					wx.error(function(res) {
+						console.log(res)
+						//alert(res);
+					});
+      })
+      wx.ready(function(res) {
+				wx.onMenuShareAppMessage({
+					title:_title,
+					desc: desc,
+					link: link,
+					imgUrl:imgUrl,
+					trigger: function(res) {},
+					success: function(res) {console.log(res)},
+					cancel: function(res) {},
+					fail: function(res) {console.log(res)}
+				});
+				wx.onMenuShareTimeline({
+					title:_title ,
+					desc: desc,
+					link: link,
+					imgUrl:imgUrl,
+					trigger: function(res) {},
+					success: function(res) {console.log(res)},
+					cancel: function(res) {},
+					fail: function(res) {console.log(res)}
+				});
+			});
     }
   },
   watch:{
